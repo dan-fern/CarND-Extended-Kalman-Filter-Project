@@ -9,14 +9,14 @@ using Eigen::VectorXd;
 
 
 /** Constructor */
-KalmanFilter::KalmanFilter()
+KalmanFilter::KalmanFilter( )
 {
 
 }
 
 
 /** Destructor */
-KalmanFilter::~KalmanFilter()
+KalmanFilter::~KalmanFilter( )
 {
 
 }

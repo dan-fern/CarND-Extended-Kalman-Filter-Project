@@ -1,6 +1,6 @@
 #include "FusionEKF.h"
-#include "tools.h"
-#include "Eigen/Dense"
+//#include "tools.h"
+//#include "Eigen/Dense"
 #include <iostream>
 
 
@@ -85,9 +85,15 @@ void FusionEKF::ProcessMeasurement( const MeasurementPackage &measurement_pack )
         {
 
             // Convert radar from polar to cartesian coordinates
-            float rho = measurement_pack.raw_measurements_(0);
-            float phi = measurement_pack.raw_measurements_(1);
-            float rho_dot = measurement_pack.raw_measurements_(2);
+            float rho = measurement_pack.raw_measurements_( 0 );
+            float phi = measurement_pack.raw_measurements_( 1 );
+            float rho_dot = measurement_pack.raw_measurements_( 2 );
+
+            // Normalize phi
+            if( phi > M_PI || phi < -M_PI )
+            {
+                phi -= 2 * M_PI;
+            }
 
             // Initialize state
             ekf_.x_( 0 ) = rho * cos( phi );
@@ -100,8 +106,8 @@ void FusionEKF::ProcessMeasurement( const MeasurementPackage &measurement_pack )
         {
 
             // Initialize state
-            ekf_.x_(0) = measurement_pack.raw_measurements_(0);
-            ekf_.x_(1) = measurement_pack.raw_measurements_(1);
+            ekf_.x_( 0 ) = measurement_pack.raw_measurements_( 0 );
+            ekf_.x_( 1 ) = measurement_pack.raw_measurements_( 1 );
 
         }
 
@@ -168,7 +174,7 @@ void FusionEKF::ProcessMeasurement( const MeasurementPackage &measurement_pack )
 
         ekf_.R_ = R_laser_;
 
-        ekf_.Update( measurement_pack.raw_measurements_ );     
+        ekf_.Update( measurement_pack.raw_measurements_ );
 
     }
 
