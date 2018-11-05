@@ -40,22 +40,6 @@ FusionEKF::FusionEKF( )
            1, 1, 0, 0,
            1, 1, 1, 1;
 
-    //the initial transition matrix F_
-    ekf_.F_ = MatrixXd( 4, 4 );
-
-    ekf_.F_ << 1, 0, 1, 0,
-               0, 1, 0, 1,
-               0, 0, 1, 0,
-               0, 0, 0, 1;
-
-    //state covariance matrix P
-    ekf_.P_ = MatrixXd( 4, 4 );
-
-    ekf_.P_ << 1, 0, 0, 0,
-               0, 1, 0, 0,
-               0, 0, 1000, 0,
-               0, 0, 0, 1000;
-
 }
 
 
@@ -69,31 +53,38 @@ FusionEKF::~FusionEKF( )
 /** Run the whole flow of the Kalman Filter from here */
 void FusionEKF::ProcessMeasurement( const MeasurementPackage &measurement_pack )
 {
-
     /*****************************************************************************
     *  Initialization
     ****************************************************************************/
     if ( !is_initialized_ )
     {
-
         // first measurement
-        cout << "EKF: " << endl;
         ekf_.x_ = VectorXd( 4 );
+
         ekf_.x_ << 1, 1, 1, 1;
+
+        //initial transition matrix, F
+        ekf_.F_ = MatrixXd( 4, 4 );
+
+        ekf_.F_ << 1, 0, 1, 0,
+                   0, 1, 0, 1,
+                   0, 0, 1, 0,
+                   0, 0, 0, 1;
+
+        //initial state covariance matrix, P
+        ekf_.P_ = MatrixXd( 4, 4 );
+
+        ekf_.P_ << 1, 0, 0, 0,
+                   0, 1, 0, 0,
+                   0, 0, 1000, 0,
+                   0, 0, 0, 1000;
 
         if ( measurement_pack.sensor_type_ == MeasurementPackage::RADAR )
         {
-
             // Convert radar from polar to cartesian coordinates
             float rho = measurement_pack.raw_measurements_( 0 );
             float phi = measurement_pack.raw_measurements_( 1 );
             float rho_dot = measurement_pack.raw_measurements_( 2 );
-
-            // Normalize phi
-            if( phi > M_PI || phi < -M_PI )
-            {
-                phi -= 2 * M_PI;
-            }
 
             // Initialize state
             ekf_.x_( 0 ) = rho * cos( phi );
@@ -104,7 +95,6 @@ void FusionEKF::ProcessMeasurement( const MeasurementPackage &measurement_pack )
         }
         else if ( measurement_pack.sensor_type_ == MeasurementPackage::LASER )
         {
-
             // Initialize state
             ekf_.x_( 0 ) = measurement_pack.raw_measurements_( 0 );
             ekf_.x_( 1 ) = measurement_pack.raw_measurements_( 1 );
@@ -167,7 +157,7 @@ void FusionEKF::ProcessMeasurement( const MeasurementPackage &measurement_pack )
         ekf_.UpdateEKF( measurement_pack.raw_measurements_ );
 
     }
-    else
+    else if( measurement_pack.sensor_type_ == MeasurementPackage::LASER )
     {
         // Laser updates
         ekf_.H_ = H_laser_;

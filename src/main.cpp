@@ -121,7 +121,7 @@ int main( )
                     gnd_truth.push_back( gt_values );
 
                     //Call ProcessMeasurment(meas_package) for Kalman filter
-                    fEKF.ProcessMeasurement(meas_package);
+                    fEKF.ProcessMeasurement( meas_package );
 
                     //Push the current estimated x,y positon from the Kalman filter's state vector
                     VectorXd estimate(4);
@@ -140,13 +140,16 @@ int main( )
 
                     VectorXd RMSE = tools.CalculateRMSE( estimates, gnd_truth );
 
+                    cout << "X: " << RMSE( 0 ) << " Y: " << RMSE( 1 );
+                    cout << " Vx: " << RMSE( 2 ) << " Vy: " << RMSE( 3 ) << endl;
+
                     json msgJson;
                     msgJson["estimate_x"] = p_x;
                     msgJson["estimate_y"] = p_y;
-                    msgJson["rmse_x"] =  RMSE(0);
-                    msgJson["rmse_y"] =  RMSE(1);
-                    msgJson["rmse_vx"] = RMSE(2);
-                    msgJson["rmse_vy"] = RMSE(3);
+                    msgJson["rmse_x"] =  RMSE( 0 );
+                    msgJson["rmse_y"] =  RMSE( 1 );
+                    msgJson["rmse_vx"] = RMSE( 2 );
+                    msgJson["rmse_vy"] = RMSE( 3 );
                     auto msg = "42[\"estimate_marker\"," + msgJson.dump() + "]";
 
                     ws.send( msg.data( ), msg.length( ), uWS::OpCode::TEXT );
